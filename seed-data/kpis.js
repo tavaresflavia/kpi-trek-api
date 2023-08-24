@@ -1,7 +1,7 @@
 module.exports =  [
     {
       id: 1,
-      name: "Production Efficiency",
+      title: "Production Efficiency",
       description: "Measures the ratio of actual output to expected output in the production line.",
       target: 95,
       upper_limit: 98,
@@ -11,7 +11,7 @@ module.exports =  [
     },
     {
       id: 2,
-      name: "Defect Rate",
+      title: "Defect Rate",
       description: "Tracks the percentage of defective products in a production batch.",
       target: 2,
       upper_limit: 4,
@@ -21,7 +21,7 @@ module.exports =  [
     },
     {
       id: 3,
-      name: "Machine Downtime",
+      title: "Machine Downtime",
       description: "Monitors the total time that production machines are non-operational.",
       target: 5,
       upper_limit: 8,
@@ -31,7 +31,7 @@ module.exports =  [
     },
     {
       id: 4,
-      name: "Cycle Time",
+      title: "Cycle Time",
       description: "Measures the average time it takes to complete a manufacturing process.",
       target: 60,
       upper_limit: 70,
@@ -41,7 +41,7 @@ module.exports =  [
     },
     {
       id: 5,
-      name: "Yield Rate",
+      title: "Yield Rate",
       description: "Calculates the percentage of products that meet quality standards.",
       target: 98,
       upper_limit: 99,
@@ -51,7 +51,7 @@ module.exports =  [
     },
     {
       id: 6,
-      name: "On-Time Delivery",
+      title: "On-Time Delivery",
       description: "Tracks the percentage of orders delivered on time to customers.",
       target: 95,
       upper_limit: 98,
@@ -61,7 +61,7 @@ module.exports =  [
     },
     {
       id: 7,
-      name: "Energy Efficiency",
+      title: "Energy Efficiency",
       description: "Monitors energy consumption and efficiency in manufacturing processes.",
       target: 85,
       upper_limit: 90,
@@ -71,7 +71,7 @@ module.exports =  [
     },
     {
       id: 8,
-      name: "Waste Reduction",
+      title: "Waste Reduction",
       description: "Measures the reduction of waste in the manufacturing process.",
       target: 10,
       upper_limit: 15,

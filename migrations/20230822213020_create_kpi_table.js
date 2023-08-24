@@ -7,7 +7,7 @@ exports.up = function(knex) {
         .createTable("kpi", (table) =>{
             table.increments("id").primary();
             table.integer("created_by").unsigned().notNullable();
-            table.string("name").notNullable();
+            table.string("title").notNullable();
             table.string("description",500).notNullable();
             table.decimal("target");
             table.decimal("upper_limit");
