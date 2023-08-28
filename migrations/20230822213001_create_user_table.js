@@ -6,13 +6,12 @@ exports.up = function(knex) {
     return knex.schema
     .createTable("user", (table) =>{
         table.increments("id").primary();
-        table.string("name").notNullable();
+        table.string("username").notNullable();
         table.string("email").notNullable();
-        table.string("team").notNullable();
-        
-
-
-
+        table.string("team");
+        table.string("google_id");
+        table.string("avatar_url");
+    
     })
   
 };

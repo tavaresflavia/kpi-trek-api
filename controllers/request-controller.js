@@ -1,28 +1,148 @@
-const knex = require('knex')(require('../knexfile'));
+const knex = require("knex")(require("../knexfile"));
+const config = require("../utils/config");
+const { requestColumns } = config;
 
-const findAssignedToMe = (req,res) => {
-     knex("request")
-        .join("user", "user.id", "request.created_by")
-        .where("assigned_to","=",req.body.userId) 
-        .then((requestsFound) => {
-            console.log(requestsFound);
-            if (requestsFound.length === 0){
-                return res
-                .status(404)
-                .send(`Requests for user with ID: ${req.body.user} not found`)
-            }
-            res.status(200).json(requestsFound);
+const findOne = (req, res) => {
+  knex("request")
+    .where("id", "=", req.params.requestId)
+    .then((requestsFound) => {
+      if (requestsFound.length === 0) {
+        return res
+          .status(404)
+          .send(`Request with ID: ${req.body.requestId} not found`);
+      }
+      res.status(200).json(requestsFound);
+    })
+    .catch(() => {
+      res
+        .status(500)
+        .send(
+          `Unable to retrieve request data for request ID: ${req.body.requestId}`
+        );
+    });
+};
 
-        })
-        .catch(() =>{
-            res.status(500).send(`Unable to retrieve request data for user with ID: ${req.body.user}`)
-        })
+const findAssignedToMe = (req, res) => {
+  knex("request")
+    // .join("user", "user.id", "request.assigned_to")
+    .where("assigned_to", "=", req.params.userId)
+    .then((requestsFound) => {
+      if (requestsFound.length === 0) {
+        return res
+          .status(404)
+          .send(`Requests for user with ID: ${req.params.userId} not found`);
+      }
+      return res.status(200).json(requestsFound);
+    })
+    .catch(() => {
+      res
+        .status(500)
+        .send(
+          `Unable to retrieve request data for user with ID: ${req.params.userId}`
+        );
+    });
+};
 
-}
+const findCreatedByMe = (req, res) => {
+  knex("request")
+    .join("user", "user.id", "request.created_by")
+    .where("created_by", "=", req.body.userId)
+    .then((requestsFound) => {
+      if (requestsFound.length === 0) {
+        return res
+          .status(404)
+          .send(`Requests for user with ID: ${req.body.userId} not found`);
+      }
+      res.status(200).json(requestsFound);
+    })
+    .catch(() => {
+      res
+        .status(500)
+        .send(
+          `Unable to retrieve request data for user with ID: ${req.body.userId}`
+        );
+    });
+};
+
+const findByKpiId = (req, res) => {
+  knex("request")
+    .join("kpi", "kpi.id", "request.kpi_id")
+    .where("kpi_id", "=", req.params.kpiId)
+    .then((requestsFound) => {
+      if (requestsFound.length === 0) {
+        return res
+          .status(404)
+          .send(`Requests for user with KPI ID: ${req.params.kpiId} not found`);
+      }
+      res.status(200).json(requestsFound);
+    })
+    .catch(() => {
+      res
+        .status(500)
+        .send(
+          `Unable to retrieve request data for user with KPI ID: ${req.params.kpiId}`
+        );
+    });
+};
+
+const update = (req, res) => {
+  requestColumns.forEach((column) => {
+    if (!req.body[column]) {
+      return res
+        .status(400)
+        .send("Unsuccessful. Missing properties in the request body.");
+    }
+  });
+  knex("request")
+    .where("kpi_id", "=", req.params.requestId)
+    .update(req.body)
+    .then((result) => {
+      if (result === 0) {
+        return res
+          .status(400)
+          .send(`Unable to update request ${req.params.requestId}`);
+      }
+
+      return knex("request").where("id", "=", req.params.requestId).first();
+    })
+    .then((updatedRequest) => {
+      res.status(201).json(updatedRequest);
+    })
+    .catch(() => {
+      res.status(500).send(`Unable to update request ${req.params.requestId}`);
+    });
+};
+
+const add = (req, res) => {
+  requestColumns.forEach((column) => {
+    if (!req.body[column]) {
+      return res
+        .status(400)
+        .send("Unsuccessful. Missing properties in the request body.");
+    }
+  });
+  knex("request")
+    .insert(req.body)
+    .then((result) => {
+      if (result === 0) {
+        return res.status(400).send(`Unable to create new request`);
+      }
+
+      return knex("request").where("id", "=", result[0]).first();
+    })
+    .then((createdRequest) => {
+      return res.status(201).json(createdRequest);
+    })
+    .catch(() => {
+      res.status(500).send(`Unable to create new request`);
+    });
+};
 
 module.exports = {
-    findAssignedToMe,
-    // findCreatedByMe,
-
-    
-}
+  findAssignedToMe,
+  findCreatedByMe,
+  findByKpiId,
+  findOne,
+  update,
+  add,
+};

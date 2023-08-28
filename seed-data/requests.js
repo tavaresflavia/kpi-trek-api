@@ -6,7 +6,7 @@ module.exports = [{
     occurrence: 10,
     detection: 10,
     rpn: 1000,
-    status: "Open",
+    request_status: "Open",
     created_by: 1,
     assigned_to: 4,
     kpi_id: 1,
@@ -20,7 +20,7 @@ module.exports = [{
     occurrence: 7,
     detection: 8,
     rpn: 392,
-    status: "pending",
+    request_status: "pending",
     created_by: 1,
     assigned_to: 4,
     kpi_id: 1
@@ -33,7 +33,7 @@ module.exports = [{
     occurrence: 3,
     detection: 5,
     rpn: 45,
-    status: "open",
+    request_status: "open",
     created_by: 1,
     assigned_to: 8,
     kpi_id: 1
@@ -47,7 +47,7 @@ module.exports = [{
     occurrence: 3,
     detection: 4,
     rpn: 24,
-    status: "open",
+    request_status: "open",
     created_by: 1,
     assigned_to: 2,
     kpi_id: 2
@@ -60,7 +60,7 @@ module.exports = [{
     occurrence: 4,
     detection: 4,
     rpn: 48,
-    status: "pending",
+    request_status: "pending",
     created_by: 1,
     assigned_to: 2,
     kpi_id: 2
@@ -73,7 +73,7 @@ module.exports = [{
     occurrence: 3,
     detection: 5,
     rpn: 60,
-    status: "open",
+    request_status: "open",
     created_by: 1,
     assigned_to: 2,
     kpi_id: 2,
@@ -87,7 +87,7 @@ module.exports = [{
     occurrence: 5,
     detection: 4,
     rpn: 80,
-    status: "resolved",
+    request_status: "resolved",
     created_by: 1,
     assigned_to: 3,
     kpi_id: 3
@@ -100,7 +100,7 @@ module.exports = [{
     occurrence: 4,
     detection: 4,
     rpn: 48,
-    status: "open",
+    request_status: "open",
     created_by: 1,
     assigned_to: 3,
     kpi_id: 3
@@ -113,7 +113,7 @@ module.exports = [{
     occurrence: 3,
     detection: 5,
     rpn: 30,
-    status: "pending",
+    request_status: "pending",
     created_by: 1,
     assigned_to: 3,
     kpi_id: 3

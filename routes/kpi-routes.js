@@ -3,15 +3,15 @@ kpiController = require("../controllers/kpi-controller");
 
 router.route("/")
     .get(kpiController.findAll)
+    .post(kpiController.add)
+
+router.route("/entries/:kpiId")
+    .get(kpiController.findEntries)
 
 router.route("/:kpiId")
     .get(kpiController.findOne)
-    .post(kpiController.update)
+    .put(kpiController.update)
 
-// router.route("/:kpiId/requests")
-
-
-// router.route("/:kpiId/entries")
 
 module.exports = router;
 

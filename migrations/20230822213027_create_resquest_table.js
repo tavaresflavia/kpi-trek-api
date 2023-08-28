@@ -14,7 +14,7 @@ exports.up = function (knex) {
     table.integer("severity").unsigned().notNullable();
     table.integer("occurrence").unsigned().notNullable();
     table.integer("detection").unsigned().notNullable();
-    table.string("status").notNullable();
+    table.string("request_status").notNullable();
 
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table
