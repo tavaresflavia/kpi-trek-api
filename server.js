@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 5050;
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
+// const LocalStrategy = require('passport-local').Strategy;
 
 const knex = require('knex')(require('./knexfile.js'));
 
@@ -74,8 +75,9 @@ function(_accessToken, _refreshToken, profile, done) {
 }
 ));
 
+
+
 passport.serializeUser((user, done) => {
-  console.log('serializeUser (user object):', user);
 
   // Store only the user id in session
   done(null, user.id);
@@ -84,7 +86,6 @@ passport.serializeUser((user, done) => {
 // `deserializeUser` receives a value sent from `serializeUser` `done` function
 // We can then retrieve full user information from our database using the userId
 passport.deserializeUser((userId, done) => {
-  console.log('deserializeUser (user id):', userId);
 
   // Query user information from the database for currently authenticated user
   knex('user')

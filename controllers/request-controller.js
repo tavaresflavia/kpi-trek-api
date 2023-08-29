@@ -24,10 +24,11 @@ const findOne = (req, res) => {
 
 const findAssignedToMe = (req, res) => {
   knex("request")
-    // .join("user", "user.id", "request.assigned_to")
+    .join("user", "user.id", "request.assigned_to")
     .where("assigned_to", "=", req.params.userId)
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
+        console.log(requestsFound)
         return res
           .status(404)
           .send(`Requests for user with ID: ${req.params.userId} not found`);
@@ -46,12 +47,12 @@ const findAssignedToMe = (req, res) => {
 const findCreatedByMe = (req, res) => {
   knex("request")
     .join("user", "user.id", "request.created_by")
-    .where("created_by", "=", req.body.userId)
+    .where("created_by", "=", req.params.userId)
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
         return res
           .status(404)
-          .send(`Requests for user with ID: ${req.body.userId} not found`);
+          .send(`Requests for user with ID: ${req.params.userId} not found`);
       }
       res.status(200).json(requestsFound);
     })
@@ -59,7 +60,7 @@ const findCreatedByMe = (req, res) => {
       res
         .status(500)
         .send(
-          `Unable to retrieve request data for user with ID: ${req.body.userId}`
+          `Unable to retrieve request data for user with ID: ${req.params.userId}`
         );
     });
 };

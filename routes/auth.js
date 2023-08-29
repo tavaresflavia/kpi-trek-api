@@ -1,12 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
 const passport = require('passport');
-
-
 require('dotenv').config();
-
-
 
 // Google endpoints
 router.get('/google', passport.authenticate('google', {
@@ -15,7 +10,6 @@ router.get('/google', passport.authenticate('google', {
     'https://www.googleapis.com/auth/userinfo.profile'
   ]
 }));
-
 
 router.get('/google/callback', 
   passport.authenticate('google', { failureRedirect: '/login' }),

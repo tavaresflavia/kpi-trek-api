@@ -91,7 +91,6 @@ const add = (req, res) => {
   knex("kpi")
   .insert({ title, description, target, lower_limit, upper_limit, unit,  created_by } )
   .then((result) => {
-    console.log(result)
     if (result.length === 0) {
       return res
         .status(404)
