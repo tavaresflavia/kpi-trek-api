@@ -8,6 +8,7 @@ exports.up = function(knex) {
         table.increments("id").primary();
         table.string("username").notNullable();
         table.string("email").notNullable();
+        table.string("password");
         table.string("team");
         table.string("google_id");
         table.string("avatar_url");

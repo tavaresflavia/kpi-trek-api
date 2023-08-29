@@ -2,6 +2,7 @@ const express = require('express');
 const expressSession = require('express-session');
 const cors = require('cors');
 const helmet = require('helmet');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -43,7 +44,7 @@ passport.use(new GoogleStrategy({
   callbackURL: process.env.GOOGLE_CALLBACK_URL
 },
 function(_accessToken, _refreshToken, profile, done) {
-  console.log('Google profile:', profile);
+
 
   knex('user')
     .select('id')
@@ -90,8 +91,6 @@ passport.deserializeUser((userId, done) => {
     .where({ id: userId })
     .then(user => {
       // Remember that knex will return an array of records, so we need to get a single record from it
-      console.log('req.user:', user[0]);
-
       // The full user object will be attached to request object as `req.user`
       done(null, user[0]);
     })
@@ -104,9 +103,11 @@ passport.deserializeUser((userId, done) => {
 const authRoutes = require('./routes/auth');
 const kpiRoutes = require('./routes/kpi-routes');
 const requestRoutes = require('./routes/request-routes');
+const jwtRoutes = require('./routes/jwt-auth')
 
 // all routes
 app.use('/auth', authRoutes);
+app.use('/jwt-auth', jwtRoutes);
 app.use('/kpis', kpiRoutes);
 app.use('/requests',requestRoutes);
 
