@@ -104,13 +104,16 @@ passport.deserializeUser((userId, done) => {
 const authRoutes = require('./routes/auth');
 const kpiRoutes = require('./routes/kpi-routes');
 const requestRoutes = require('./routes/request-routes');
-const jwtRoutes = require('./routes/jwt-auth')
+const jwtRoutes = require('./routes/jwt-auth');
+const commentRoutes = require('./routes/comment-routes');
+
 
 // all routes
 app.use('/auth', authRoutes);
 app.use('/jwt-auth', jwtRoutes);
 app.use('/kpis', kpiRoutes);
 app.use('/requests',requestRoutes);
+app.use('/comments',commentRoutes);
 
 app.listen(PORT, () => {
     console.log(`running at http://localhost:${PORT}`);

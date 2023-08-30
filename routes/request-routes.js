@@ -1,5 +1,3 @@
-const { request } = require('express');
-
 const router = require('express').Router();
 requestController = require('../controllers/request-controller')
 

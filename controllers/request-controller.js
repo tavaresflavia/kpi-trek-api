@@ -24,11 +24,24 @@ const findOne = (req, res) => {
 
 const findAssignedToMe = (req, res) => {
   knex("request")
-    .join("user", "user.id", "request.assigned_to")
-    .where("assigned_to", "=", req.params.userId)
+    .select(
+      "request.id",
+      "request.title",
+      "request.description",
+      " request.rpn",
+      "request.request_status",
+      "kpi.title as kpi_title",
+      "request.created_at",
+      "u1.username as created_by",
+      "u2.username as assigned_to"
+    )
+    .join("kpi", "request.kpi_id", "kpi.id")
+    .leftJoin("user as u1", "request.created_by", "u1.id")
+    .leftJoin("user as u2", "request.assigned_to", "u2.id")
+    .where("request.assigned_to", "=", req.params.userId)
+    .orderBy(`request.${ req.query.sort === "rpn" ? "rpn":"created_at"}`, 'desc')
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
-        console.log(requestsFound)
         return res
           .status(404)
           .send(`Requests for user with ID: ${req.params.userId} not found`);
@@ -46,8 +59,22 @@ const findAssignedToMe = (req, res) => {
 
 const findCreatedByMe = (req, res) => {
   knex("request")
-    .join("user", "user.id", "request.created_by")
-    .where("created_by", "=", req.params.userId)
+    .select(
+      "request.id",
+      "request.title",
+      "request.description",
+      " request.rpn",
+      "request.request_status",
+      "kpi.title as kpi_title",
+      "request.created_at",
+      "u1.username as created_by",
+      "u2.username as assigned_to"
+    )
+    .join("kpi", "request.kpi_id", "kpi.id")
+    .leftJoin("user as u1", "request.created_by", "u1.id")
+    .leftJoin("user as u2", "request.assigned_to", "u2.id")
+    .where("request.created_by", "=", req.params.userId)
+    .orderBy(`request.${req.query.sort}`, 'desc')
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
         return res
@@ -87,16 +114,15 @@ const findByKpiId = (req, res) => {
 };
 
 const update = (req, res) => {
-  requestColumns.forEach((column) => {
-    if (!req.body[column]) {
+  
+    if (!req.params.requestId) {
       return res
         .status(400)
-        .send("Unsuccessful. Missing properties in the request body.");
-    }
-  });
+        .send("Unsuccessful. Missing status in the request body.");
+    };
   knex("request")
-    .where("kpi_id", "=", req.params.requestId)
-    .update(req.body)
+    .where("request_id", "=", req.params.requestId)
+    .update({"request.request_status" : req.body.status})
     .then((result) => {
       if (result === 0) {
         return res
