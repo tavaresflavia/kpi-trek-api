@@ -6,11 +6,6 @@ const findByRequest = (req,res) => {
     .join("user", "comment.created_by", "user.id")
     .where("comment.request_id", "=", req.params.requestId)
     .then((commentsFound) => {
-        if (commentsFound.length === 0) {
-          return res
-            .status(404)
-            .send(`Comments from request with ID: ${req.params.requestId} not found`);
-        }
         res.status(200).json(commentsFound);
       })
       .catch(() => {

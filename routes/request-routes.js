@@ -15,7 +15,7 @@ router.route("/kpi/:kpiId")
 
 router.route("/:requestId")
     .get(requestController.findOne)
-    .put(requestController.update)
+    .patch(requestController.update)
 
 
 

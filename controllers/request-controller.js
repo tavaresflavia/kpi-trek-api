@@ -114,15 +114,14 @@ const findByKpiId = (req, res) => {
 };
 
 const update = (req, res) => {
-  
-    if (!req.params.requestId) {
+    if (!req.body.request_status) {
       return res
         .status(400)
         .send("Unsuccessful. Missing status in the request body.");
     };
   knex("request")
-    .where("request_id", "=", req.params.requestId)
-    .update({"request.request_status" : req.body.status})
+    .where("id", "=", req.params.requestId)
+    .update(req.body)
     .then((result) => {
       if (result === 0) {
         return res

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 kpiController = require("../controllers/kpi-controller");
 
-router.route("/")
+router.route("/:userId")
     .get(kpiController.findAll)
     .post(kpiController.add)
 

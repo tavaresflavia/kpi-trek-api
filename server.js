@@ -106,6 +106,7 @@ const kpiRoutes = require('./routes/kpi-routes');
 const requestRoutes = require('./routes/request-routes');
 const jwtRoutes = require('./routes/jwt-auth');
 const commentRoutes = require('./routes/comment-routes');
+const userRoutes = require('./routes/user-routes.js');
 
 
 // all routes
@@ -114,6 +115,7 @@ app.use('/jwt-auth', jwtRoutes);
 app.use('/kpis', kpiRoutes);
 app.use('/requests',requestRoutes);
 app.use('/comments',commentRoutes);
+app.use('/users',userRoutes);
 
 app.listen(PORT, () => {
     console.log(`running at http://localhost:${PORT}`);

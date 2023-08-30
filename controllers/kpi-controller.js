@@ -5,20 +5,21 @@ const { isValidEmail, isValidLimits } = config;
 
 const findAll = (req, res) => {
   knex("kpi")
+    .select("kpi.id", "title")
     .join("user", "user.id", "kpi.created_by")
-    .where("created_by", "=", req.body.userId)
+    .where("kpi.created_by", "=", req.params.userId)
     .then((kpisFound) => {
       if (kpisFound.length === 0) {
         return res
           .status(404)
-          .send(`KPIs for user with ID: ${req.body.user} not found`);
+          .send(`KPIs for user with ID: ${req.params.user} not found`);
       }
       res.status(200).json(kpisFound);
     })
     .catch(() => {
       res
         .status(500)
-        .send(`Unable to retrieve kpi data for user with ID: ${req.body.user}`);
+        .send(`Unable to retrieve kpi data for user with ID: ${req.params.user}`);
     });
 };
 
