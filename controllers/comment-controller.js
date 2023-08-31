@@ -18,7 +18,24 @@ const findByRequest = (req,res) => {
 }
 
 const addComment = (req,res) => {
+  ["content","request_id","created_by"].forEach((column) => {
+    if (!req.body[column]) {
+      return res
+        .status(400)
+        .send("Unsuccessful. Missing properties in the request body.");
+    }
+  });
   knex('comment')
+  .insert(req.body)
+  .then((result) =>{
+    if (result === 0) {
+      return res.status(400).send(`Unable add new comment`);
+    }
+    return knex("comment").where("id", "=", result[0]).first();
+    })
+    .catch(() => {
+      res.status(500).send(`Unable to add new comment`);
+    });
 
 
 }

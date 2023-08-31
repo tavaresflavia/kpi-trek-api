@@ -9,11 +9,6 @@ const findAll = (req, res) => {
     .join("user", "user.id", "kpi.created_by")
     .where("kpi.created_by", "=", req.params.userId)
     .then((kpisFound) => {
-      if (kpisFound.length === 0) {
-        return res
-          .status(404)
-          .send(`KPIs for user with ID: ${req.params.user} not found`);
-      }
       res.status(200).json(kpisFound);
     })
     .catch(() => {

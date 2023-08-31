@@ -3,6 +3,8 @@ commentController = require('../controllers/comment-controller');
 
 router.route("/:requestId")
     .get(commentController.findByRequest)
-    // .post(commentController)
+
+router.route("/")
+    .post(commentController.addComment)
 
 module.exports = router;
