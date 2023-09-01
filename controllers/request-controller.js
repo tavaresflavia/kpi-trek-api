@@ -110,8 +110,9 @@ const findCreatedByMe = (req, res) => {
 
 const findByKpiId = (req, res) => {
   knex("request")
-    .join("kpi", "kpi.id", "request.kpi_id")
+    .select("id", "rpn", "created_at", "request_status", "title")
     .where("kpi_id", "=", req.params.kpiId)
+    .limit(req.query.limit)
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
         return res

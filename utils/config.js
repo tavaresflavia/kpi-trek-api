@@ -27,7 +27,7 @@ function isValidLimits(lower,upper,target){
         return false;
     }
     if(target && upper && lower){
-    if ( lower >= upper || target > upper || target < lower){
+    if ( lower >= upper || target >= upper || target <= lower){
         return false;
     }
     }

@@ -2,9 +2,10 @@ const knex = require("knex")(require("../knexfile"));
 
 const findByRequest = (req,res) => {
     knex('comment')
-    .select("user.username as username", "comment.created_at", "comment.content","comment.request_id")
+    .select("user.username as username", "created_at", "content","request_id")
     .join("user", "comment.created_by", "user.id")
     .where("comment.request_id", "=", req.params.requestId)
+    .orderBy( "created_at","desc")
     .then((commentsFound) => {
         res.status(200).json(commentsFound);
       })
@@ -32,6 +33,10 @@ const addComment = (req,res) => {
       return res.status(400).send(`Unable add new comment`);
     }
     return knex("comment").where("id", "=", result[0]).first();
+    })
+    .then((result) =>{
+      return res.status(200).json(result)
+
     })
     .catch(() => {
       res.status(500).send(`Unable to add new comment`);
