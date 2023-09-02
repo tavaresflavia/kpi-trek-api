@@ -37,7 +37,8 @@ router.get('/logout', (req, res) => {
           return res.status(500).json({message: "Server error, please try again later", error: error});
       }
       // Redirect the user back to client-side application
-      res.redirect(process.env.CLIENT_URL);
+    // res.redirect(process.env.CLIENT_HOST);
+    res.sendStatus(200);
   });
 });
 

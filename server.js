@@ -12,6 +12,7 @@ const GoogleStrategy = require('passport-google-oauth2').Strategy;
 // const LocalStrategy = require('passport-local').Strategy;
 
 const knex = require('knex')(require('./knexfile.js'));
+app.use(express.static('./public'));
 
 require('dotenv').config();
 

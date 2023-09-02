@@ -1,5 +1,7 @@
 const knex = require("knex")(require("../knexfile"));
 const config = require("../utils/config");
+const nodemailer = require("nodemailer");
+
 const { requestColumns } = config;
 
 const findAll = (req, res) => {
@@ -164,16 +166,56 @@ const add = (req, res) => {
         .send("Unsuccessful. Missing properties in the request body.");
     }
   });
-  knex("request")
+  const insertRequest = knex("request")
     .insert(req.body)
     .then((result) => {
       if (result === 0) {
         return res.status(400).send(`Unable to create new request`);
       }
-      return knex("request").where("id", "=", result[0]).first();
+      return knex("user").where("id", "=", req.body.assigned_to).first();
     })
-    .then((createdRequest) => {
-      res.status(201).json(createdRequest);
+    .then(async (assignee) => {
+      const assignor = await knex("user")
+        .where("id", "=", req.body.created_by)
+        .first();
+      return [assignee, assignor];
+    })
+    .then((results) => {
+      const [assignee, assignor] = results;
+
+      const mailTransporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      });
+      mailTransporter.verify().then(console.log).catch(console.error);
+
+      let mailDetails = {
+        from: process.env.EMAIL,
+        to: `${assignee.email}`,
+        subject: `[KPI Trek] - ${assignor.username} assigned ${req.body.title} to you`,
+        html: `<div style="display:flex; justify-content:center;height:80px; width:100%"><img style="height:80px;" src=${`http://localhost:${process.env.PORT}/assets/images/logo.png`}></img></div>
+        <h2 style="font-weight:700; color:#303c6c;">Hi ${assignee.username},</h2> 
+        <p style="font-size:14px;"> ${assignor.username} assigned a new request to you. </p>
+        <h3 style="text-align: center;font-weight:600; color:#303c6c;">${req.body.title}</h3> 
+        <div style="display:flex; justify-content:center;"><p style="text-align: center;margin-block: 16px; width:300px; padding: 16px; box-shadow: 0 0 8px 4px #d0d0d0; border-radius: 0.625rem;">${req.body.description}</p></div>
+        <div style="display:flex; justify-content:center;"><a style="font-weight:400; font-size:14px; padding: 8px 16px; border-radius:20px;background-color:#303c6c; color:#fff; margin:auto; text-decoration:none;" href=${`${process.env.CLIENT_HOST}/Request`}>View Request</a></div>`,
+      };
+
+      mailTransporter.sendMail(mailDetails, function (err, data) {
+        if (err) {
+          console.log("Error Occurs");
+          console.log(err);
+        } else {
+          console.log("Email sent successfully");
+        }
+      });
+    })
+    .then(() => {
+      return res.sendStatus(201);
     })
     .catch(() => {
       res.status(500).send(`Unable to create new request`);
