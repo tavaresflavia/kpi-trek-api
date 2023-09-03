@@ -2,21 +2,11 @@ const knex = require("knex")(require("../knexfile"));
 const config = require("../utils/config");
 const nodemailer = require("nodemailer");
 
-const { requestColumns } = config;
+const { requestColumns, requestQueryColumns } = config;
 
 const findAll = (req, res) => {
   knex("request")
-    .select(
-      "request.id",
-      "request.title",
-      "request.description",
-      " request.rpn",
-      "request.request_status",
-      "kpi.title as kpi_title",
-      "request.created_at",
-      "u1.username as created_by",
-      "u2.username as assigned_to"
-    )
+    .select(requestQueryColumns)
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
@@ -39,17 +29,7 @@ const findAll = (req, res) => {
 
 const findAssignedToMe = (req, res) => {
   knex("request")
-    .select(
-      "request.id",
-      "request.title",
-      "request.description",
-      " request.rpn",
-      "request.request_status",
-      "kpi.title as kpi_title",
-      "request.created_at",
-      "u1.username as created_by",
-      "u2.username as assigned_to"
-    )
+    .select(requestQueryColumns)
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
@@ -77,17 +57,7 @@ const findAssignedToMe = (req, res) => {
 
 const findCreatedByMe = (req, res) => {
   knex("request")
-    .select(
-      "request.id",
-      "request.title",
-      "request.description",
-      " request.rpn",
-      "request.request_status",
-      "kpi.title as kpi_title",
-      "request.created_at",
-      "u1.username as created_by",
-      "u2.username as assigned_to"
-    )
+    .select(requestQueryColumns)
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
@@ -114,7 +84,7 @@ const findByKpiId = (req, res) => {
   knex("request")
     .select("id", "rpn", "created_at", "request_status", "title")
     .where("kpi_id", "=", req.params.kpiId)
-    .limit(req.query.limit)
+    .orderBy("created_at", "desc")
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
         return res
@@ -169,6 +139,7 @@ const add = (req, res) => {
   const insertRequest = knex("request")
     .insert(req.body)
     .then((result) => {
+
       if (result === 0) {
         return res.status(400).send(`Unable to create new request`);
       }
@@ -182,6 +153,7 @@ const add = (req, res) => {
     })
     .then((results) => {
       const [assignee, assignor] = results;
+      console.log("here")
 
       const mailTransporter = nodemailer.createTransport({
         host: "smtp.ethereal.email",
