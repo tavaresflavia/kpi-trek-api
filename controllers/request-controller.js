@@ -136,17 +136,21 @@ const add = (req, res) => {
       if (result === 0) {
         return res.status(400).send(`Unable to create new request`);
       }
-      return knex("user").where("id", "=", req.body.assigned_to).first();
+      return knex("request").where("id", "=", result[0]).first();
+      
     })
-    .then(async (assignee) => {
+    .then(async (createdRequest) => {
+      const assignee = await knex("user").where("id", "=", req.body.assigned_to).first();
+      return [createdRequest,assignee];
+    })
+    .then(async (result) => {
       const assignor = await knex("user")
         .where("id", "=", req.body.created_by)
         .first();
-      return [assignee, assignor];
+      return [...result, assignor];
     })
     .then((results) => {
-      const [assignee, assignor] = results;
-      console.log("here")
+      const [createdRequest,assignee, assignor] = results;
 
       const mailTransporter = nodemailer.createTransport({
         host: "smtp.ethereal.email",
@@ -167,7 +171,7 @@ const add = (req, res) => {
         <p style="font-size:14px;"> ${assignor.username} assigned a new request to you. </p>
         <h3 style="text-align: center;font-weight:600; color:#303c6c;">${req.body.title}</h3> 
         <div style="display:flex; justify-content:center;"><p style="text-align: center;margin-block: 16px; width:300px; padding: 16px; box-shadow: 0 0 8px 4px #d0d0d0; border-radius: 0.625rem;">${req.body.description}</p></div>
-        <div style="display:flex; justify-content:center;"><a style="font-weight:400; font-size:14px; padding: 8px 16px; border-radius:20px;background-color:#303c6c; color:#fff; margin:auto; text-decoration:none;" href=${`${process.env.CLIENT_HOST}/Request`}>View Request</a></div>`,
+        <div style="display:flex; justify-content:center;"><a style="font-weight:400; font-size:14px; padding: 8px 16px; border-radius:20px;background-color:#303c6c; color:#fff; margin:auto; text-decoration:none;" href=${`${process.env.CLIENT_HOST}/Request/${createdRequest.id}`}>View Request</a></div>`,
       };
 
       mailTransporter.sendMail(mailDetails, function (err, data) {
@@ -178,9 +182,10 @@ const add = (req, res) => {
           console.log("Email sent successfully");
         }
       });
+      return createdRequest
     })
-    .then(() => {
-      return res.sendStatus(201);
+    .then((createdRequest) => {
+      return res.status(201).send(createdRequest);
     })
     .catch(() => {
       res.status(500).send(`Unable to create new request`);
