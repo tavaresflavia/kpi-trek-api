@@ -10,6 +10,7 @@ module.exports = [{
     created_by: 1,
     assigned_to: 4,
     kpi_id: 1,
+    created_at: "2023-01-02"
     
   },
   {
@@ -20,10 +21,12 @@ module.exports = [{
     occurrence: 7,
     detection: 8,
     rpn: 392,
-    request_status: "pending",
+    request_status: "Pending",
     created_by: 1,
     assigned_to: 4,
-    kpi_id: 1
+    kpi_id: 1,
+    created_at: "2023-06-02"
+
   },
   {
     id: 3,
@@ -33,10 +36,12 @@ module.exports = [{
     occurrence: 3,
     detection: 5,
     rpn: 45,
-    request_status: "open",
+    request_status: "Open",
     created_by: 1,
     assigned_to: 8,
-    kpi_id: 1
+    kpi_id: 1,
+    created_at: "2023-07-12"
+
     
   },
   {
@@ -47,10 +52,12 @@ module.exports = [{
     occurrence: 3,
     detection: 4,
     rpn: 24,
-    request_status: "open",
+    request_status: "Open",
     created_by: 1,
     assigned_to: 2,
-    kpi_id: 2
+    kpi_id: 2,
+    created_at: "2023-08-06"
+
   },
   {
     id: 5,
@@ -60,10 +67,11 @@ module.exports = [{
     occurrence: 4,
     detection: 4,
     rpn: 48,
-    request_status: "pending",
+    request_status: "Pending",
     created_by: 1,
     assigned_to: 2,
-    kpi_id: 2
+    kpi_id: 2,
+    created_at: "2023-08-13"
   },
   {
     id: 6,
@@ -73,10 +81,11 @@ module.exports = [{
     occurrence: 3,
     detection: 5,
     rpn: 60,
-    request_status: "open",
+    request_status: "Open",
     created_by: 1,
     assigned_to: 2,
     kpi_id: 2,
+    created_at: "2023-04-06"
     
   },
   {
@@ -87,10 +96,11 @@ module.exports = [{
     occurrence: 5,
     detection: 4,
     rpn: 80,
-    request_status: "resolved",
+    request_status: "Resolved",
     created_by: 1,
     assigned_to: 3,
-    kpi_id: 3
+    kpi_id: 3,
+    created_at: "2023-05-17"
   },
   {
     id: 8,
@@ -100,10 +110,11 @@ module.exports = [{
     occurrence: 4,
     detection: 4,
     rpn: 48,
-    request_status: "open",
+    request_status: "Open",
     created_by: 1,
     assigned_to: 3,
-    kpi_id: 3
+    kpi_id: 3,
+    created_at: "2023-07-28"
   },
   {
     id: 9,
@@ -113,9 +124,10 @@ module.exports = [{
     occurrence: 3,
     detection: 5,
     rpn: 30,
-    request_status: "pending",
+    request_status: "Pending",
     created_by: 1,
     assigned_to: 3,
-    kpi_id: 3
+    kpi_id: 3,
+    created_at: "2023-02-08"
   }
   ]
