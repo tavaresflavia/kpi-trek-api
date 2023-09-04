@@ -2,14 +2,14 @@
 
 **KPI Trek is a website designed to help your team to manage Key Performance Indicators (KPIs) and collaborate seamlessly through ticket-based requests.**  
 
-![mockup](/assets/images/mockup.png)  
+![mockup](/public/assets/images/mockup.png)  
 
 This project was ideated and executed within 2 weeks as a capstone project for BrainStation's full-stack bootcamp. 
 
 **Front End:**  
 create-react-app  
 react-router  
-SASS  a
+SASS  
 Chart.js  
 Moment.js  
 
