@@ -18,22 +18,40 @@ const findAll = (req, res) => {
     )
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
-        return res.status(404).send(`Unable to retrive requests`);
+        return res.status(404).send(`Unable to retrieve requests`);
       }
       res.status(200).json(requestsFound);
     })
     .catch(() => {
-      res.status(500).send(`Unable to retrive requests`);
+      res.status(500).send(`Unable to retrieve requests`);
     });
 };
 
-const findAssignedToMe = (req, res) => {
+const findOne = (req, res) => {
+  knex("request")
+    .select(requestQueryColumns)
+    .where("request.id", "=", req.params.requestId)
+    .join("kpi", "request.kpi_id", "kpi.id")
+    .leftJoin("user as u1", "request.created_by", "u1.id")
+    .leftJoin("user as u2", "request.assigned_to", "u2.id")
+    .then((requestsFound) => {
+      if (requestsFound.length === 0) {
+        return res.status(404).send(`Unable to retrieve requests`);
+      }
+      res.status(200).json(requestsFound);
+    })
+    .catch(() => {
+      res.status(500).send(`Unable to retrieve requests`);
+    });
+};
+
+const findByAssignment = (req, res) => {
   knex("request")
     .select(requestQueryColumns)
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
-    .where("request.assigned_to", "=", req.params.userId)
+    .where(`request.${req.query.assign}`, "=", req.params.userId)
     .orderBy(
       `request.${req.query.sort === "rpn" ? "rpn" : "created_at"}`,
       "desc"
@@ -45,31 +63,6 @@ const findAssignedToMe = (req, res) => {
           .send(`Requests for user with ID: ${req.params.userId} not found`);
       }
       return res.status(200).json(requestsFound);
-    })
-    .catch(() => {
-      res
-        .status(500)
-        .send(
-          `Unable to retrieve request data for user with ID: ${req.params.userId}`
-        );
-    });
-};
-
-const findCreatedByMe = (req, res) => {
-  knex("request")
-    .select(requestQueryColumns)
-    .join("kpi", "request.kpi_id", "kpi.id")
-    .leftJoin("user as u1", "request.created_by", "u1.id")
-    .leftJoin("user as u2", "request.assigned_to", "u2.id")
-    .where("request.created_by", "=", req.params.userId)
-    .orderBy(`request.${req.query.sort}`, "desc")
-    .then((requestsFound) => {
-      if (requestsFound.length === 0) {
-        return res
-          .status(404)
-          .send(`Requests for user with ID: ${req.params.userId} not found`);
-      }
-      res.status(200).json(requestsFound);
     })
     .catch(() => {
       res
@@ -195,10 +188,10 @@ const add = (req, res) => {
 };
 
 module.exports = {
-  findAssignedToMe,
-  findCreatedByMe,
+  findByAssignment,
   findByKpiId,
   findAll,
+  findOne,
   update,
   add,
 };

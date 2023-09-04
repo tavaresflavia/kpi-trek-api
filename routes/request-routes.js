@@ -1,24 +1,16 @@
-const router = require('express').Router();
-requestController = require('../controllers/request-controller')
+const router = require("express").Router();
+requestController = require("../controllers/request-controller");
 
-router.route("/")
-    .post(requestController.add)
+router.route("/").post(requestController.add);
 
-router.route("/:userId")
-    .get(requestController.findAll)
+router.route("/:userId").get(requestController.findAll);
 
-router.route("/assignedto/:userId")
-    .get(requestController.findAssignedToMe)
+router.route("/assignment/:userId").get(requestController.findByAssignment);
 
-router.route("/createdby/:userId")
-    .get(requestController.findCreatedByMe)
+router.route("/kpi/:kpiId").get(requestController.findByKpiId);
 
-router.route("/kpi/:kpiId")
-    .get(requestController.findByKpiId)
+router.route("/:requestId").patch(requestController.update);
 
-router.route("/:requestId")
-    .patch(requestController.update)
-    
-    
+router.route("/single/:requestId").get(requestController.findOne);
 
-module.exports = router;    
+module.exports = router;
