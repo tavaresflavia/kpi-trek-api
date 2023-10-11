@@ -29,11 +29,11 @@ app.use(
 app.use(
   expressSession({
     secret: process.env.SESSION_SECRET,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     cookie: {
-      domain: '.kpi-trek.netlify.app', 
-      secure: true, 
+      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax', 
+      secure: process.env.NODE_ENV === "production", // must be true if sameSite='none'
     },
   })
 );
