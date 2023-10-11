@@ -32,7 +32,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      domain: 'kpi-trek.netlify.app', 
+      domain: '.kpi-trek.netlify.app', 
       secure: true, 
     },
   })
