@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 5050;
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
-// const LocalStrategy = require('passport-local').Strategy;
 
 const knex = require('knex')(require('./knexfile.js'));
 app.use(express.static('./public'));
@@ -44,7 +43,8 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL
+  callbackURL: process.env.GOOGLE_CALLBACK_URL, 
+  proxy: true
 },
 function(_accessToken, _refreshToken, profile, done) {
 
