@@ -22,6 +22,7 @@ router.get('/google/callback',
 router.get('/profile', (req, res) => {
   // Passport stores authenticated user information on `req.user` object.
   // Comes from done function of `deserializeUser`
+  console.log(req);
   if (req.user === undefined) return res.status(401).json({ message: 'Unauthorized' });
 
   // If user is currently authenticated, send back user info

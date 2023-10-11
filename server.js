@@ -19,10 +19,11 @@ require('dotenv').config();
 app.use(express.json());
 
 app.use(helmet());
+const allowedOrigins = ['https://kpi-trek.netlify.app','http://localhost:3000']; 
 
 app.use(
   cors({
-    origin: true,
+    origin: allowedOrigins,
     credentials: true
   })
 );
