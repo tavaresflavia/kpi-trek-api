@@ -12,7 +12,7 @@ router.get('/google', passport.authenticate('google', {
 }));
 
 router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { successRedirect: process.env.CLIENT_HOST,  failureRedirect: `${process.env.CLIENT_HOST}/login` }),
   function(_req, res) {
     // Successful authentication, redirect to client-side application
     res.redirect(process.env.CLIENT_HOST);
