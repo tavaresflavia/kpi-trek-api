@@ -2,7 +2,6 @@ const express = require('express');
 const expressSession = require('express-session');
 const cors = require('cors');
 const helmet = require('helmet');
-const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -31,7 +30,11 @@ app.use(
   expressSession({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+      domain: 'kpi-trek.netlify.app', 
+      secure: true, 
+    },
   })
 );
 
