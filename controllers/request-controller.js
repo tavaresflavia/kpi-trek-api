@@ -166,7 +166,7 @@ const add = (req, res) => {
         from: process.env.EMAIL,
         to: `${assignee.email}`,
         subject: `[KPI Trek] - ${assignor.username} assigned ${req.body.title} to you`,
-        html: `<div style="display:flex; justify-content:center;height:80px; width:100%"><img style="height:80px;" src=${`http://localhost:${process.env.PORT}/assets/images/logo.png`}></img></div>
+        html: `<div style="display:flex; justify-content:center;height:80px; width:100%"><img style="height:80px;" src=${`${process.env.SERVER_HOST}/assets/images/logo.png`}></img></div>
         <h2 style="font-weight:700; color:#303c6c;">Hi ${assignee.username},</h2> 
         <p style="font-size:14px;"> ${assignor.username} assigned a new request to you. </p>
         <h3 style="text-align: center;font-weight:600; color:#303c6c;">${req.body.title}</h3> 
