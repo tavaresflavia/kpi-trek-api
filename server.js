@@ -26,6 +26,8 @@ app.use(
   })
 );
 
+app.set('trust proxy', 1);
+
 app.use(
   expressSession({
     secret: process.env.SESSION_SECRET,
