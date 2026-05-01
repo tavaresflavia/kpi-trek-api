@@ -53,29 +53,39 @@ passport.use(new GoogleStrategy({
 },
 function(_accessToken, _refreshToken, profile, done) {
   knex('user')
-    .select('id')
+    .select('id', 'google_id')
     .where({ google_id: profile.id })
+    .orWhere({ email: profile.email })
+    .first()
     .then(user => {
-      if (user.length) {
-        done(null, user[0]);
-      } else {
-        knex('user')
-          .insert({
-            google_id: profile.id,
-            avatar_url: profile._json.picture,
-            username: profile.displayName,
-            email: profile.email
-          })
-          .then(userId => {
-            done(null, { id: userId[0] });
-          })
-          .catch(err => {
-            console.log('Error creating a user', err);
-          });
+      if (user) {
+        if (!user.google_id) {
+          return knex('user')
+            .where({ id: user.id })
+            .update({
+              google_id: profile.id,
+              avatar_url: profile._json.picture
+            })
+            .then(() => done(null, { id: user.id }));
+        }
+
+        return done(null, { id: user.id });
       }
+
+      return knex('user')
+        .insert({
+          google_id: profile.id,
+          avatar_url: profile._json.picture,
+          username: profile.displayName,
+          email: profile.email
+        })
+        .then(userId => {
+          done(null, { id: userId[0] });
+        });
     })
     .catch(err => {
       console.log('Error fetching a user', err);
+      done(err);
     });
 }
 ));
