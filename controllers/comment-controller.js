@@ -52,7 +52,7 @@ const addComment = (req,res) => {
   })
   .then((result) =>{
     if (!result) {
-      return;
+      return null;
     }
 
     if (result === 0) {
@@ -61,6 +61,10 @@ const addComment = (req,res) => {
     return knex("comment").where("id", "=", result[0]).first();
     })
     .then((result) =>{
+      if (!result) {
+        return;
+      }
+
       return res.status(200).json(result)
 
     })
