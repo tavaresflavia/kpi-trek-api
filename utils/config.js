@@ -30,18 +30,31 @@ function isValidEmail(Email) {
 
 
 
+function hasValue(value) {
+    return value !== undefined
+        && value !== null
+        && (typeof value !== "string" || value.trim() !== "");
+}
+
 function isValidLimits(lower,upper,target){
-    if (target && !Number.isFinite(target)){
+    const hasLower = hasValue(lower);
+    const hasUpper = hasValue(upper);
+    const hasTarget = hasValue(target);
+    const numericLower = Number(lower);
+    const numericUpper = Number(upper);
+    const numericTarget = Number(target);
+
+    if (hasTarget && !Number.isFinite(numericTarget)){
         return false
 }
-    if (lower && !Number.isFinite(lower)){
+    if (hasLower && !Number.isFinite(numericLower)){
         return false;
 }   
-    if (upper &&  !Number.isFinite(upper)){
+    if (hasUpper &&  !Number.isFinite(numericUpper)){
         return false;
     }
-    if(target && upper && lower){
-    if ( lower >= upper || target >= upper || target <= lower){
+    if(hasTarget && hasUpper && hasLower){
+    if ( numericLower >= numericUpper || numericTarget >= numericUpper || numericTarget <= numericLower){
         return false;
     }
     }

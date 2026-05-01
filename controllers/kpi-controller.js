@@ -45,9 +45,7 @@ const update = (req, res) => {
       .status(400)
       .send("Unsuccessful. Missing properties in the request body.");
   }
-  if (
-    !isValidLimits(Number(lower_limit), Number(upper_limit), Number(target))
-  ) {
+  if (!isValidLimits(lower_limit, upper_limit, target)) {
     return res.status(400).send("Invalid limits.");
   }
 
@@ -83,9 +81,7 @@ const add = (req, res) => {
       .status(400)
       .send("Unsuccessful. Missing properties in the request body.");
   }
-  if (
-    !isValidLimits(Number(lower_limit), Number(upper_limit), Number(target))
-  ) {
+  if (!isValidLimits(lower_limit, upper_limit, target)) {
     return res.status(400).send("Invalid limits.");
   }
 
@@ -135,7 +131,7 @@ const addEntry = (req, res) => {
   req.body.created_by = req.user.id;
 
   const { created_by, kpi_id, value } = req.body;
-  if (!created_by || !kpi_id || !value) {
+  if (!created_by || !kpi_id || value === undefined || value === null || value === "") {
     return res
       .status(400)
       .send("Unsuccessful. Missing properties in the request body.");
@@ -154,7 +150,7 @@ const addEntry = (req, res) => {
     })
     .then((result) => {
       if (!result) {
-        return;
+        return null;
       }
 
       if (result.length === 0) {
@@ -163,6 +159,10 @@ const addEntry = (req, res) => {
       return knex("kpi_entry").where("id", "=", result[0]).first();
     })
     .then((createdKpiEntry) => {
+      if (!createdKpiEntry) {
+        return;
+      }
+
       return res.status(201).json(createdKpiEntry);
     })
     .catch(() => {
