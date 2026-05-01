@@ -109,13 +109,6 @@ const findEntries = (req, res) => {
     .where("kpi_id", "=", req.params.kpiId)
     .andWhere("kpi.created_by", "=", req.user.id)
     .then((entriesFound) => {
-      if (entriesFound.length === 0) {
-        return res
-          .status(400)
-          .send(
-            `Unable to retrieve historical data for kpi with ID: ${req.params.kpiId}`
-          );
-      }
       return res.status(200).json(entriesFound);
     })
     .catch(() => {

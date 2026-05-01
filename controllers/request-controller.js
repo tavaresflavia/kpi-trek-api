@@ -19,9 +19,6 @@ const findAll = (req, res) => {
       "desc"
     )
     .then((requestsFound) => {
-      if (requestsFound.length === 0) {
-        return res.status(404).send(`Unable to retrieve requests`);
-      }
       res.status(200).json(requestsFound);
     })
     .catch(() => {
@@ -70,11 +67,6 @@ const findByAssignment = (req, res) => {
       "desc"
     )
     .then((requestsFound) => {
-      if (requestsFound.length === 0) {
-        return res
-          .status(404)
-          .send(`Requests for user with ID: ${req.params.userId} not found`);
-      }
       return res.status(200).json(requestsFound);
     })
     .catch(() => {
@@ -101,11 +93,6 @@ const findByKpiId = (req, res) => {
     })
     .orderBy("request.created_at", "desc")
     .then((requestsFound) => {
-      if (requestsFound.length === 0) {
-        return res
-          .status(404)
-          .send(`Requests for user with KPI ID: ${req.params.kpiId} not found`);
-      }
       res.status(200).json(requestsFound);
     })
     .catch(() => {
