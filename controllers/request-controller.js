@@ -5,13 +5,15 @@ const nodemailer = require("nodemailer");
 const { requestColumns, requestQueryColumns } = config;
 
 const findAll = (req, res) => {
+  const userId = req.user.id;
+
   knex("request")
     .select(requestQueryColumns)
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
-    .where("request.assigned_to", "=", req.params.userId)
-    .orWhere("request.created_by", "=", req.params.userId)
+    .where("request.assigned_to", "=", userId)
+    .orWhere("request.created_by", "=", userId)
     .orderBy(
       `request.${req.query.sort === "rpn" ? "rpn" : "created_at"}`,
       "desc"
@@ -28,9 +30,16 @@ const findAll = (req, res) => {
 };
 
 const findOne = (req, res) => {
+  const userId = req.user.id;
+
   knex("request")
     .select(requestQueryColumns)
     .where("request.id", "=", req.params.requestId)
+    .andWhere((builder) => {
+      builder
+        .where("request.assigned_to", "=", userId)
+        .orWhere("request.created_by", "=", userId);
+    })
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
@@ -46,12 +55,16 @@ const findOne = (req, res) => {
 };
 
 const findByAssignment = (req, res) => {
+  const userId = req.user.id;
+  const assignColumn =
+    req.query.assign === "created_by" ? "created_by" : "assigned_to";
+
   knex("request")
     .select(requestQueryColumns)
     .join("kpi", "request.kpi_id", "kpi.id")
     .leftJoin("user as u1", "request.created_by", "u1.id")
     .leftJoin("user as u2", "request.assigned_to", "u2.id")
-    .where(`request.${req.query.assign}`, "=", req.params.userId)
+    .where(`request.${assignColumn}`, "=", userId)
     .orderBy(
       `request.${req.query.sort === "rpn" ? "rpn" : "created_at"}`,
       "desc"
@@ -74,10 +87,19 @@ const findByAssignment = (req, res) => {
 };
 
 const findByKpiId = (req, res) => {
+  const userId = req.user.id;
+
   knex("request")
-    .select("id", "rpn", "created_at", "request_status", "title")
-    .where("kpi_id", "=", req.params.kpiId)
-    .orderBy("created_at", "desc")
+    .select("request.id", "request.rpn", "request.created_at", "request.request_status", "request.title")
+    .join("kpi", "request.kpi_id", "kpi.id")
+    .where("request.kpi_id", "=", req.params.kpiId)
+    .andWhere((builder) => {
+      builder
+        .where("kpi.created_by", "=", userId)
+        .orWhere("request.assigned_to", "=", userId)
+        .orWhere("request.created_by", "=", userId);
+    })
+    .orderBy("request.created_at", "desc")
     .then((requestsFound) => {
       if (requestsFound.length === 0) {
         return res
@@ -96,6 +118,8 @@ const findByKpiId = (req, res) => {
 };
 
 const update = (req, res) => {
+  const userId = req.user.id;
+
   if (!req.body.request_status) {
     return res
       .status(400)
@@ -103,7 +127,12 @@ const update = (req, res) => {
   }
   knex("request")
     .where("id", "=", req.params.requestId)
-    .update(req.body)
+    .andWhere((builder) => {
+      builder
+        .where("assigned_to", "=", userId)
+        .orWhere("created_by", "=", userId);
+    })
+    .update({ request_status: req.body.request_status })
     .then((result) => {
       if (result === 0) {
         return res
@@ -122,16 +151,31 @@ const update = (req, res) => {
 };
 
 const add = (req, res) => {
-  requestColumns.forEach((column) => {
+  req.body.created_by = req.user.id;
+
+  for (const column of requestColumns) {
     if (!req.body[column]) {
       return res
         .status(400)
         .send("Unsuccessful. Missing properties in the request body.");
     }
-  });
-  const insertRequest = knex("request")
-    .insert(req.body)
+  }
+  knex("kpi")
+    .where("id", "=", req.body.kpi_id)
+    .andWhere("created_by", "=", req.user.id)
+    .first()
+    .then((kpiFound) => {
+      if (!kpiFound) {
+        res.status(403).send("You do not have access to this KPI.");
+        return null;
+      }
+
+      return knex("request").insert(req.body);
+    })
     .then((result) => {
+      if (!result) {
+        return null;
+      }
 
       if (result === 0) {
         return res.status(400).send(`Unable to create new request`);
@@ -140,16 +184,28 @@ const add = (req, res) => {
       
     })
     .then(async (createdRequest) => {
+      if (!createdRequest) {
+        return null;
+      }
+
       const assignee = await knex("user").where("id", "=", req.body.assigned_to).first();
       return [createdRequest,assignee];
     })
     .then(async (result) => {
+      if (!result) {
+        return null;
+      }
+
       const assignor = await knex("user")
         .where("id", "=", req.body.created_by)
         .first();
       return [...result, assignor];
     })
     .then((results) => {
+      if (!results) {
+        return null;
+      }
+
       const [createdRequest,assignee, assignor] = results;
 
       const mailTransporter = nodemailer.createTransport({
@@ -185,6 +241,10 @@ const add = (req, res) => {
       return createdRequest
     })
     .then((createdRequest) => {
+      if (!createdRequest) {
+        return;
+      }
+
       return res.status(201).send(createdRequest);
     })
     .catch(() => {

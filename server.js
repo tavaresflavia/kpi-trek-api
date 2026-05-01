@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 5050;
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
+const jwt = require('jsonwebtoken');
 
 const knex = require('knex')(require('./knexfile.js'));
 app.use(express.static('./public'));
@@ -104,6 +105,43 @@ passport.deserializeUser((userId, done) => {
     });
 });
 
+const authenticateRequest = (req, res, next) => {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return next();
+  }
+
+  const authHeader = req.headers.authorization;
+  const authToken = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
+    : null;
+
+  if (!authToken) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  jwt.verify(authToken, process.env.SESSION_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid auth token' });
+    }
+
+    knex('user')
+      .where({ id: decoded.id })
+      .first()
+      .then(user => {
+        if (!user) {
+          return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        delete user.password;
+        req.user = user;
+        return next();
+      })
+      .catch(() => {
+        return res.status(500).json({ message: 'Unable to authenticate request' });
+      });
+  });
+};
+
 
 const authRoutes = require('./routes/auth');
 const kpiRoutes = require('./routes/kpi-routes');
@@ -116,10 +154,10 @@ const userRoutes = require('./routes/user-routes.js');
 // all routes
 app.use('/auth', authRoutes);
 app.use('/jwt-auth', jwtRoutes);
-app.use('/kpis', kpiRoutes);
-app.use('/requests',requestRoutes);
-app.use('/comments',commentRoutes);
-app.use('/users',userRoutes);
+app.use('/kpis', authenticateRequest, kpiRoutes);
+app.use('/requests', authenticateRequest, requestRoutes);
+app.use('/comments', authenticateRequest, commentRoutes);
+app.use('/users', authenticateRequest, userRoutes);
 
 app.listen(PORT, () => {
     console.log(`running at http://localhost:${PORT}`);
