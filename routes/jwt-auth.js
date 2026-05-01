@@ -4,37 +4,44 @@ const knex = require("knex")(require("../knexfile"));
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const isDuplicateEmailError = (err) => {
+  return err && (err.code === "ER_DUP_ENTRY" || err.errno === 1062);
+};
+
 router.post("/register", async (req, res) => {
   const { username, email, team, password } = req.body;
-
-  const userExists   =  await knex("user").where({ email });
   
   if (!username || !email || !team || !password) {
     return res.status(400).send("Please enter the required fields.");
   }
 
-  if (userExists.length !== 0) {
-    return res.status(409).send("User with that email already exists.");
+  try {
+    const userExists = await knex("user").where({ email });
+
+    if (userExists.length !== 0) {
+      return res.status(409).send("User with that email already exists.");
+    }
+
+    const hashedPassword = bcrypt.hashSync(password);
+
+    const newUser = {
+      username,
+      email,
+      team,
+      password: hashedPassword,
+    };
+
+    await knex("user").insert(newUser);
+
+    return res.status(200).send("Registered successfully");
+  } catch (err) {
+    if (isDuplicateEmailError(err)) {
+      return res.status(409).send("User with that email already exists.");
+    }
+
+    console.log(err);
+    return res.status(400).send("Failed registration");
   }
-
-  const hashedPassword = bcrypt.hashSync(password);
-
-  const newUser = {
-    username,
-    email,
-    team,
-    password: hashedPassword,
-  };
-
-  knex("user")
-    .insert(newUser)
-    .then(() => {
-      res.status(200).send("Registered successfully");
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).send("Failed registration");
-    });
 });
 
 router.post("/login", (req, res) => {
@@ -86,11 +93,13 @@ router.get("/current", (req, res) => {
 
   // Parse the bearer token
   const authHeader = req.headers.authorization;
-  const authToken = authHeader.split(" ")[1];
+  const [scheme, authToken] = authHeader.split(" ");
+
+  if (scheme !== "Bearer" || !authToken) {
+    return res.status(401).send("Invalid auth token");
+  }
 
   jwt.verify(authToken, process.env.SESSION_SECRET, (err, decoded) => {
-    console.log("Token: ", decoded);
-
     if (err) {
       return res.status(401).send("Invalid auth token");
     }
@@ -99,11 +108,15 @@ router.get("/current", (req, res) => {
       .where({ id: decoded.id })
       .first()
       .then((user) => {
+        if (!user) {
+          return res.status(404).send("User not found");
+        }
+
         delete user.password;
-        res.json(user);
+        return res.json(user);
       })
-      .catch((err) => {
-        res.send(500).send("Cant fetch user info");
+      .catch(() => {
+        res.status(500).send("Cant fetch user info");
       });
   });
 });
